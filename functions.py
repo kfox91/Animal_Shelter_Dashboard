@@ -37,15 +37,15 @@ def fetch_and_clean():
     df = pd.merge(intake_df, outcome_df, on=["animal_id", "animal_type", "name", "color", "breed"], how="inner")
 
     # Convert intake and outcome datetimes from object to datetime data
-    df["datetime_intake"] = pd.to_datetime(df["datetime_intake"])
-    df["datetime_outcome"] = pd.to_datetime(df["datetime_outcome"])
+    df["datetime_intake"] = pd.to_datetime(df["datetime_intake"], errors='coerce')
+    df["datetime_outcome"] = pd.to_datetime(df["datetime_outcome"], errors='coerce')
 
     # drop all duplicated rows
     df.drop_duplicates(subset=["animal_id", "datetime_intake"], keep=False, inplace=True)
     df.drop_duplicates(subset=["animal_id", "datetime_outcome"], keep=False, inplace=True)
 
     # Add computated column representing time spent in shelter
-    df["datetime_difference"] = abs((df["datetime_outcome"] - df["datetime_intake"]).dt.days)
+    df["datetime_difference"] = abs((df["datetime_outcome"]- df["datetime_intake"]).dt.days)
 
     # Change non Cat or Dog entries to "Other"
     df.loc[~df["animal_type"].isin(["Cat", "Dog"]), "animal_type"] = "Other"
